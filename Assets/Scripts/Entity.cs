@@ -100,7 +100,7 @@ public abstract class Entity : MonoBehaviour
         }
     }
 
-    protected virtual void Death()
+    public virtual void Death()
     {
         
     }

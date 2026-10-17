@@ -6,16 +6,16 @@ namespace Enemies
     public class EnemySpawner : MonoBehaviour
     {
         public float SpawnInterval = 0.5f;
-        public int maxEnemiesQuantity = 1;
+        public int MaxEnemiesQuantity = 5;
         public GameObject EnemyPrefab;
         
-        private Enemy _currentEnemyInstance;
+        private FsmEnemy _currentEnemyInstance;
         private float _spawnTimer;
         private int _enemiesQuantity = 0;
 
         private void Update()
         {
-            if (_enemiesQuantity >= maxEnemiesQuantity) return;
+            if (_enemiesQuantity >= MaxEnemiesQuantity && MaxEnemiesQuantity > -1) return;
             
             if (_spawnTimer <= 0)
             {
@@ -33,7 +33,8 @@ namespace Enemies
                 }
                 
                 var unitInstance = Instantiate(EnemyPrefab, transform.position, spawnRotation);
-                _currentEnemyInstance = unitInstance.GetComponent<Enemy>();
+                _currentEnemyInstance = unitInstance.GetComponent<FsmEnemy>();
+                _currentEnemyInstance.CurrentState = FsmEnemy.EnemyState.Chasing;
                 _spawnTimer = SpawnInterval;
                 _enemiesQuantity++;
             }
@@ -41,6 +42,11 @@ namespace Enemies
             {
                 _spawnTimer -= Time.deltaTime;
             }
+        }
+        
+        public void StopSpawning()
+        {
+            MaxEnemiesQuantity = 0;
         }
     }
 }

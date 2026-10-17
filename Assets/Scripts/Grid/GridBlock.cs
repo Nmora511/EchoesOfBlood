@@ -4,11 +4,11 @@ namespace Grid
 {
     public class GridBlock : MonoBehaviour
     {
-        public GridUnity.UnitType[] unitTypes = new  GridUnity.UnitType[9];
+        public GridUnit.UnitType[] unitTypes = new  GridUnit.UnitType[9];
     
-        private void Awake()
+        public void InitializeBlock()
         {
-            var gridUnits = GetComponentsInChildren<GridUnity>();
+            var gridUnits = GetComponentsInChildren<GridUnit>();
             if (gridUnits.Length < 9)
             {
                 Debug.LogError(gridUnits.Length);
@@ -18,6 +18,7 @@ namespace Grid
             for (var i = 0; i < 9; i++)
             {
                 gridUnits[i].CurrentUnitType = unitTypes[i];
+                gridUnits[i].InitializeUnit();
             }
         }
     }

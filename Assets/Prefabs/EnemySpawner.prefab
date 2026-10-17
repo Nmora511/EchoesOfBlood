@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a64882860aa7944da62cd3dd6e5b5af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemies.EnemySpawner
-  SpawnInterval: 2
-  maxEnemiesQuantity: 5
+  SpawnInterval: 5
+  MaxEnemiesQuantity: -1
   EnemyPrefab: {fileID: 4251343949696175326, guid: 1c1b3cba5a995c64caed2f9e2531eb44, type: 3}

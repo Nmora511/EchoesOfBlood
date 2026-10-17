@@ -1,8 +1,6 @@
 using System.Collections;
-using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -65,6 +63,9 @@ namespace Player
         private float _attackCooldown = 1.2f;
         private LayerMask _enemyMask;
         
+        private bool _isControlLocked = false;
+        private Vector3 _forcedDirection;
+        
         private void Awake()
         {
             if (PlayerInstance != null && PlayerInstance != this)
@@ -74,14 +75,15 @@ namespace Player
             }
         
             PlayerInstance = this;
+
+            _controller = GetComponent<CharacterController>();
+            _animator = GetComponentInChildren<Animator>();
+            _mainCamera = Camera.main;
         }
         
         private new void Start()
         {
             base.Start();
-            _controller = GetComponent<CharacterController>();
-            _mainCamera = Camera.main;
-            _animator = GetComponentInChildren<Animator>();
             _enemyMask = LayerMask.GetMask("Enemy");
             
             ScytheHitbox.Damage = AttackDamage;
@@ -89,9 +91,6 @@ namespace Player
             HealthSlider.maxValue = HealthPoints;
             DashSlider.maxValue = DashCooldown;
             UpdateSliders();
-            
-            //PlayerInput playerInput = GetComponent<PlayerInput>();
-            //sprintAction = playerInput.actions["Sprint"];
         }
 
         protected override void Update()
@@ -99,8 +98,11 @@ namespace Player
             base.Update();
             UpdateHorizontalVelocity();
             UpdateAttackStatus();
-            ApplyGravity();
-            
+            if (!_isDashing)
+            {
+                ApplyGravity();
+            }
+
             var totalMovement = _finalVelocity + _verticalVelocity + KnockbackVelocity;
 
             _controller.Move(totalMovement * Time.deltaTime);
@@ -138,6 +140,14 @@ namespace Player
 
         private void UpdateHorizontalVelocity()
         {
+            if (_isControlLocked)
+            {
+                _finalVelocity = _forcedDirection * MoveSpeed;
+                var targetRot = Quaternion.LookRotation(_forcedDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, RotationSpeed * Time.deltaTime);
+                return; 
+            }
+            
             // Dash Handler
             if (_dashCooldownTimer > 0f)
             {
@@ -212,6 +222,25 @@ namespace Player
                 _controller.Move(dir.normalized * dist);
             }
         }
+        
+        public void ForceWalk(Vector3 direction, float duration)
+        {
+            StartCoroutine(ForceWalkRoutine(direction, duration));
+        }
+
+        private IEnumerator ForceWalkRoutine(Vector3 direction, float duration)
+        {
+            _isControlLocked = true;
+            _forcedDirection = direction.normalized;
+    
+            _animator.SetFloat(Speed, 1f);
+
+            yield return new WaitForSeconds(duration);
+
+            _isControlLocked = false;
+            _animator.SetFloat(Speed, 0f);
+            _moveInput = Vector2.zero; 
+        }
 
         // Combat Handlers
         
@@ -235,7 +264,7 @@ namespace Player
             _attackCooldown = AttackDuration;
         }
 
-        protected override void Death()
+        public override void Death()
         {
             UpdateSliders();
             _animator.SetTrigger(HasDied);

@@ -6,7 +6,7 @@ namespace Enemies
     {
         public float Damage;
         
-        private void OnTriggerEnter(Collider other)
+        protected void OnTriggerEnter(Collider other)
         {
             if (!other.gameObject.CompareTag("Player")) return;
             other.GetComponent<Player.Player>().OnHit(Damage, transform.position);

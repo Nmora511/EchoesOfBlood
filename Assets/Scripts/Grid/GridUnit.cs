@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Grid
 {
-    public class GridUnity : MonoBehaviour
+    public class GridUnit : MonoBehaviour
     {
         private const string ThornTrapPrefabName = "thorn_trap";
         private const string StakesTrapPrefabName = "stake_trap";
@@ -36,7 +36,7 @@ namespace Grid
             }
         }
 
-        private void Start()
+        public void InitializeUnit()
         {
             if (CurrentUnitType == UnitType.Empty) return;
             

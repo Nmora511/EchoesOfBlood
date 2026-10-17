@@ -202,6 +202,7 @@ MonoBehaviour:
   AttackCooldown: 2.7
   AttackDamage: 20
   DamageHitbox: {fileID: 7127924320275799996}
+  AttackAngle: 15
   HitAnimationDuration: 1.5
 --- !u!54 &873160265917530473
 Rigidbody:

@@ -20,6 +20,7 @@ namespace Enemies
         public float AttackCooldown = 2.7f;
         public float AttackDamage = 5f;
         public AttackHitbox DamageHitbox;
+        public float AttackAngle = 15f;
         public float HitAnimationDuration = 1.5f;
         private float _attackTimer;
         private float _hitAnimationTimer;
@@ -51,17 +52,28 @@ namespace Enemies
         
             if (_attackTimer > 0f)  _attackTimer -= Time.deltaTime;
             if (_hitAnimationTimer > 0f) _hitAnimationTimer -= Time.deltaTime;
-        
+
+            Vector3 directionToPlayer;
+            float angleToPlayer;
+            
             switch (CurrentState)
             {
                 case EnemyState.Idle:
                     navMeshAgent.isStopped = true;
-                
-                
+                    
                     if (CanSeePlayer())
                     {
-                        navMeshAgent.stoppingDistance = _originalStoppingDistance;
-                        CurrentState = EnemyState.Chasing;
+                        directionToPlayer = (Target.position - transform.position).normalized;
+                        angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+                        if (angleToPlayer <= AttackAngle)
+                        {
+                            navMeshAgent.stoppingDistance = _originalStoppingDistance;
+                            CurrentState = EnemyState.Chasing;
+                        }
+                        else
+                        {
+                            RotateTowards(Target.position);
+                        }
                     } 
                     else if (_distanceToPlayer <= ProximityRadius * 1.5)
                     {
@@ -82,20 +94,25 @@ namespace Enemies
 
                     animator.SetBool(IsChasing, true);
                 
-                    var directionToPlayer = (Target.position - transform.position).normalized;
-                    var angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+                    directionToPlayer = (Target.position - transform.position).normalized;
+                    angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
                 
                     if (LostLineOfSight())
                     {
                         navMeshAgent.stoppingDistance = 0f;
                         CurrentState = EnemyState.Investigating;
                     }
-                    else if (_distanceToPlayer <= ProximityRadius && _attackTimer <= 0f && angleToPlayer <= 15f)
+                    else if (_distanceToPlayer <= ProximityRadius && _attackTimer <= 0f && angleToPlayer <= AttackAngle)
                     {
                         CurrentState = EnemyState.Attacking;
                         _attackTimer = AttackCooldown;
                         animator.SetBool(IsChasing, false);
                         animator.SetTrigger(HasAttacked);
+
+                        if (this is RangedEnemy rangedEnemy)
+                        {
+                            rangedEnemy.Shoot();
+                        }
                     } 
                 
                     break;
@@ -142,6 +159,7 @@ namespace Enemies
                 
                 case EnemyState.Dead:
                     base.Death();
+                    Destroy(gameObject, 5f);
                     enabled = false;
                     break;
                 
@@ -178,7 +196,7 @@ namespace Enemies
             return true;
         }
 
-        protected override void Death()
+        public override void Death()
         {
             CurrentState = EnemyState.Dead;
         }

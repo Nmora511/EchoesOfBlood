@@ -37,7 +37,7 @@ namespace Enemies
             _enemyRigidbody = GetComponent<Rigidbody>();
         }
 
-        protected override void Death()
+        public override void Death()
         {
             animator.SetTrigger(HasDied);
             enabled = false;
