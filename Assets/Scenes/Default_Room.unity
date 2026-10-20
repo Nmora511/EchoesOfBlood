@@ -237,7 +237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37d5247d1deb4ab55a5146b647859f4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomManager
-  SurviveTime: 15
+  SurviveTime: 120
   CountdownText: {fileID: 2105798571}
 --- !u!1 &169991451
 GameObject:

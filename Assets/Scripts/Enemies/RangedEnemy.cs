@@ -23,8 +23,10 @@ namespace Enemies
             
             var shootDirection = targetPoint - transform.position;
             
-            var currentArrow = Instantiate(ArrowObject, transform.position + transform.forward, Quaternion.identity);
-            currentArrow.transform.forward = shootDirection.normalized;
+            var spawnPosition = transform.position + transform.forward + Vector3.up * 0.5f;
+            var spawnRotation = Quaternion.LookRotation(shootDirection) * Quaternion.Euler(90f, 0f, 0f);
+
+            var currentArrow = Instantiate(ArrowObject, spawnPosition, spawnRotation);
 
             currentArrow.AddForce(shootDirection.normalized *  ArrowForce, ForceMode.Impulse);
         }

@@ -53,18 +53,19 @@ namespace Grid
             var T = GridUnit.UnitType.ThornTrap;
             var S = GridUnit.UnitType.StakesTrap;
             var G = GridUnit.UnitType.GroundEnemySpawner;
+            var R = GridUnit.UnitType.RangedEnemySpawner;
             
             var rawLayout = new GridUnit.UnitType[][]
             {
                 new [] { G, E, E, E, E, E, E, T, E },
                 new [] { E, S, E, E, E, E, E, S, E },
-                new [] { E, E, T, E, G, E, E, E, E },
+                new [] { E, E, T, E, G, E, E, R, E },
                 new [] { E, E, E, E, E, E, E, E, E },
-                new [] { E, G, E, S, E, T, E, E, E },
+                new [] { E, R, E, S, E, T, E, E, E },
                 new [] { E, E, E, E, E, G, S, E, T },
                 new [] { E, T, E, E, E, E, G, E, E },
                 new [] { E, E, E, S, E, E, E, E, E },
-                new [] { T, E, E, E, E, E, E, E, G }
+                new [] { T, E, E, E, E, E, E, E, R }
             };
 
             InitiateGridTypes(rawLayout);

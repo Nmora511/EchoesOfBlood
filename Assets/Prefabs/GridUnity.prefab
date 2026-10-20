@@ -168,6 +168,8 @@ MonoBehaviour:
     prefab: {fileID: 7918368198850540629, guid: b8b83af9a89b49849a739dc1d9136349, type: 3}
   - type: 3
     prefab: {fileID: 7774208473216957411, guid: 418d3f65f66b3294abc0cf12d33d7012, type: 3}
+  - type: 4
+    prefab: {fileID: 6160645119032815179, guid: 5820d947456af27408c7313e595d7676, type: 3}
 --- !u!64 &3107964802524400928
 MeshCollider:
   m_ObjectHideFlags: 0

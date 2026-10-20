@@ -6,11 +6,7 @@ namespace Grid
 {
     public class GridUnit : MonoBehaviour
     {
-        private const string ThornTrapPrefabName = "thorn_trap";
-        private const string StakesTrapPrefabName = "stake_trap";
-        private const string GroundEnemyPrefabName = "Ground_Enemy";
-        
-        public enum UnitType {Empty,ThornTrap, StakesTrap, GroundEnemySpawner}
+        public enum UnitType {Empty,ThornTrap, StakesTrap, GroundEnemySpawner, RangedEnemySpawner}
         
         [System.Serializable]
         public struct UnitMapping

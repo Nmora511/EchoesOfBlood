@@ -22,6 +22,18 @@ namespace Enemies
         public AttackHitbox DamageHitbox;
         public float AttackAngle = 15f;
         public float HitAnimationDuration = 1.5f;
+        
+        [Header("Vision & Senses Settings")]
+        public float ViewRadius = 20f; 
+        [Range(0, 360)]
+        public float ViewAngle = 150f; 
+        public float ProximityRadius = 3f; 
+        public LayerMask ObstacleLayer;
+
+        [Header("Advanced AI Feel")]
+        public Vector3 EyeOffset = new Vector3(0, 1f, 0);
+        public float InvestigationOvershoot = 1.5f;
+        
         private float _attackTimer;
         private float _hitAnimationTimer;
         
@@ -210,18 +222,6 @@ namespace Enemies
             var distanceToPlayer = directionToPlayer.magnitude;
 
             return distanceToPlayer > ViewRadius * 1.5f || Physics.Raycast(transform.position, directionToPlayer.normalized, distanceToPlayer, ObstacleLayer);
-        }
-    
-        private void RotateTowards(Vector3 targetPosition)
-        {
-            var direction = targetPosition - transform.position;
-            direction.y = 0f; 
-
-            // Using 0.001f instead of checking for Vector3.zero prevents micro-jitters 
-            if (direction.sqrMagnitude < 0.001f) return;
-            var lookRotation = Quaternion.LookRotation(direction.normalized);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
-
         }
 
         private void CalculateLastKnownPosition()
