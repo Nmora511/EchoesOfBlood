@@ -530,6 +530,10 @@ PrefabInstance:
       propertyPath: IsOpen
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5513249109627230909, guid: 97b61e2b57337e094b21ec6a6ee6768e, type: 3}
+      propertyPath: DoorType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6898043092764722004, guid: 97b61e2b57337e094b21ec6a6ee6768e, type: 3}
       propertyPath: m_Name
       value: ExitDoor
@@ -622,6 +626,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bf0f48c372a8d2f438149c7141362c9a, type: 3}
+--- !u!1001 &1016174440
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.643
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -22.17
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 763729423871458689, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 6365465076342264887, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+      propertyPath: m_Name
+      value: Arrow (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
 --- !u!1001 &1034490916
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1733,22 +1794,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5513249109627230909, guid: 97b61e2b57337e094b21ec6a6ee6768e, type: 3}
       propertyPath: IsOpen
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5513249109627230909, guid: 97b61e2b57337e094b21ec6a6ee6768e, type: 3}
-      propertyPath: DoorType
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6898043092764722004, guid: 97b61e2b57337e094b21ec6a6ee6768e, type: 3}
       propertyPath: m_Name
       value: EntryDoor
       objectReference: {fileID: 0}
-    - target: {fileID: 8015516331165916560, guid: 97b61e2b57337e094b21ec6a6ee6768e, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8015516331165916560, guid: 97b61e2b57337e094b21ec6a6ee6768e, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1766,3 +1818,4 @@ SceneRoots:
   - {fileID: 99369627}
   - {fileID: 4899500874746947573}
   - {fileID: 284447569}
+  - {fileID: 1016174440}

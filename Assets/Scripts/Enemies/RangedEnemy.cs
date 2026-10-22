@@ -24,7 +24,7 @@ namespace Enemies
             var shootDirection = targetPoint - transform.position;
             
             var spawnPosition = transform.position + transform.forward + Vector3.up * 0.5f;
-            var spawnRotation = Quaternion.LookRotation(shootDirection) * Quaternion.Euler(90f, 0f, 0f);
+            var spawnRotation = Quaternion.LookRotation(shootDirection) * Quaternion.Euler(90f, 0f, 180f);
 
             var currentArrow = Instantiate(ArrowObject, spawnPosition, spawnRotation);
 
