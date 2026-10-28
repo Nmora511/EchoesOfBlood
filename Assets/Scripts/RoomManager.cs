@@ -18,7 +18,8 @@ public class RoomManager : MonoBehaviour
     {
         if (_isRoomCompleted) return;
 
-        CountdownText.text = $"SOBREVIVA - {FormatTime(SurviveTime)}!";
+        var roomNumber = RunManager.Instance.RoomIndex + 1;
+        CountdownText.text = $"SALA {roomNumber}/{RunManager.RoomsPerRun} - SOBREVIVA - {FormatTime(SurviveTime)}!";
         
         if (SurviveTime > 0 && PlayerClass.PlayerInstance is not null && PlayerClass.PlayerInstance.HealthPoints > 0)
         {
@@ -39,6 +40,8 @@ public class RoomManager : MonoBehaviour
             return;
         }
         
+        RunManager.Instance.OnRoomCompleted();
+        
         var enemySpawners = FindObjectsByType<EnemySpawner>();
         foreach (var spawner in enemySpawners)
         {
@@ -54,7 +57,6 @@ public class RoomManager : MonoBehaviour
         var doors = FindObjectsByType<DoorClass>();
         foreach (var door in doors)
         {
-            // Opcional: Pode verificar se quer abrir só as saídas com:
             if (door.DoorType == DoorClass.DoorTypeEnum.Exit)
             {
                 door.Open();

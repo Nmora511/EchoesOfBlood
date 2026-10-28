@@ -14,7 +14,6 @@ namespace Player
         private static readonly int HasDashed = Animator.StringToHash("hasDashed");
         private static readonly int HasDied = Animator.StringToHash("hasDied");
 
-
         public static Player PlayerInstance { get; private set; }
 
         [Header("Combat Settings")] 
@@ -280,7 +279,8 @@ namespace Player
 
         public void RestartGame()
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            RunManager.Instance.OnRunEnded(false);
+            RunManager.Instance.StartNewRun();
         }
         
         // UI Handlers

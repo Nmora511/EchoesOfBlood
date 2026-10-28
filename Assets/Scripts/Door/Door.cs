@@ -18,6 +18,7 @@ namespace Door
         private Collider _doorCollider;
         private Animator _doorAnimator;
         private readonly float _autoWalkDuration = 0.5f;
+        private bool _hasExited = false;
         
         private void Start()
         {
@@ -43,10 +44,11 @@ namespace Door
         
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player") && DoorType == DoorTypeEnum.Exit && IsOpen)
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            }
+            if (!other.CompareTag("Player") || DoorType != DoorTypeEnum.Exit || !IsOpen || _hasExited) return;
+            
+            // Prevents calling LoadNext twice if more than one Player collider enters the trigger.
+            _hasExited = true;
+            RunManager.Instance.LoadNext();
         }
 
         public void Open()

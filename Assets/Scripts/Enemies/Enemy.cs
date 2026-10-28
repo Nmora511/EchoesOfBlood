@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -11,6 +12,9 @@ namespace Enemies
         [Header("Target Reference")]
         public Transform Target;
 
+        // Raised when the enemy dies. To listen: enemy.Died += MyMethod;
+        public event Action Died;
+        
         protected NavMeshAgent navMeshAgent;
         protected Animator animator;
 
@@ -33,6 +37,7 @@ namespace Enemies
             navMeshAgent.enabled = false;
             _enemyRigidbody.useGravity = false;
             _enemyCollider.enabled = false;
+            Died?.Invoke();
         }
         
         protected void RotateTowards(Vector3 targetPosition)
