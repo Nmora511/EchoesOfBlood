@@ -13,7 +13,7 @@ namespace Grid
         [Tooltip("Optional. A 1x1x1 cube-like prefab, scaled to fit each wall. Empty = plain Unity cube.")]
         [SerializeField] private GameObject wallPrefab;
         [SerializeField] private bool buildWalls = true;
-        [SerializeField] private float wallHeight = 1f;
+        [SerializeField] private float wallHeight = 2f;
         [SerializeField] private float wallThickness = 0.5f;
         
         private GridBlock[] _blocks;
@@ -83,8 +83,8 @@ namespace Grid
         {
             var isNeighborValid = neighborRow is >= 0 and < RoomLayout.BlocksPerSide &&
                          neighborCol is >= 0 and < RoomLayout.BlocksPerSide;
-            var isNeighborActivated = shape[neighborRow * RoomLayout.BlocksPerSide + neighborCol];
-            if (isNeighborValid && isNeighborActivated) return;
+            var isNeighborActivated = isNeighborValid && shape[neighborRow * RoomLayout.BlocksPerSide + neighborCol];
+            if (isNeighborActivated) return;
 
             var sideCenter = center + side * (blockSize / 2f);
             var along = Vector3.Cross(Vector3.up, side); // direction the wall runs in
@@ -102,12 +102,13 @@ namespace Grid
         
         private void CreateWall(Transform parent, Vector3 position, Vector3 along, float length)
         {
-            var wall = wallPrefab is not null ? Instantiate(wallPrefab) : GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var wall = wallPrefab != null ? Instantiate(wallPrefab) : GameObject.CreatePrimitive(PrimitiveType.Cube);
             wall.name = "Wall";
             wall.transform.SetParent(parent, true);
             wall.transform.position = position + Vector3.up * (wallHeight / 2f);
             wall.transform.rotation = Quaternion.LookRotation(along, Vector3.up);
             wall.transform.localScale = new Vector3(wallThickness, wallHeight, length);
+            Debug.Log(wallHeight);
         }
         
         // Sorting keys shared by Grid and GridBlock: row 0 is the top (largest z), column 0 is the left (smallest x).

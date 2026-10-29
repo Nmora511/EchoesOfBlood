@@ -10,8 +10,6 @@ namespace Grid
 {
     public class GridBlock : MonoBehaviour
     {
-        private GridUnit[] _units;
-
         // Center of the block in world space (average of its 9 cells).
         public Vector3 Center
         {
@@ -35,7 +33,7 @@ namespace Grid
 
         // Cells sorted top to bottom, left to right, so cell i is always gene cell i.
         private GridUnit[] Units =>
-            _units ??= GetComponentsInChildren<GridUnit>(true).OrderBy(Grid.GridSort.Row).ThenBy(Grid.GridSort.Column).ToArray();
+            GetComponentsInChildren<GridUnit>(true).OrderBy(Grid.GridSort.Row).ThenBy(Grid.GridSort.Column).ToArray();
         
         public void InitializeBlock(RoomPlan room, int blockIndex)
         {
@@ -87,7 +85,7 @@ namespace Grid
         private static void MultiplyTrapDamage(GameObject instance, float multiplier)
         {
             var trap = instance.GetComponentInChildren<Trap>();
-            if (trap is not null) trap.Damage *= multiplier;
+            if (trap != null) trap.Damage *= multiplier;
         }
     }
 }

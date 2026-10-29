@@ -46,7 +46,7 @@ public class RunManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         Config = Resources.Load<GameBalanceConfig>("GameBalanceConfig");
-        if (Config is null)
+        if (Config == null)
         {
             Debug.LogWarning("[RunManager] Assets/Resources/GameBalanceConfig not found, using default values.");
             Config = ScriptableObject.CreateInstance<GameBalanceConfig>();
