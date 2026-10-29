@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24e49434d57b826a88ef82aeda983bef, type: 3}
+  m_Name: GameBalanceConfig
+  m_EditorClassIdentifier: Assembly-CSharp::GameBalanceConfig
+  MinBlocksPerRoom: 5
+  RoomRanges:
+    EnemyHealthMultiplier:
+      Min: 0.6
+      Max: 2
+    EnemyDamageMultiplier:
+      Min: 0.6
+      Max: 2
+    GroundMaxAlive:
+      Min: 1
+      Max: 3
+    RangedMaxAlive:
+      Min: 1
+      Max: 3
+    SpawnInterval:
+      Min: 1
+      Max: 8
+    GroundAttackCooldown:
+      Min: 1.5
+      Max: 4
+    RangedAttackCooldown:
+      Min: 1.5
+      Max: 5
+    TrapDamageMultiplier:
+      Min: 0.5
+      Max: 2
+    SurviveTime:
+      Min: 45
+      Max: 120
+  RepairRules:
+    MinSpawners: 1
+    MaxSpawners: 6
+    DoorClearance: 1
+  Seed: -1
+  LogRoomLayout: 1

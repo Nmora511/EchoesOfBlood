@@ -1,29 +1,35 @@
 using System.Collections.Generic;
 using System.Linq;
+using Evolution.Rooms;
 using UnityEngine;
 
 namespace Grid
 {
     public class GridUnit : MonoBehaviour
     {
-        public enum UnitType {Empty,ThornTrap, StakesTrap, GroundEnemySpawner, RangedEnemySpawner}
         
         [System.Serializable]
         public struct UnitMapping
         {
-            public UnitType type;
+            public CellType type;
             public GameObject prefab;
         }
 
-        public UnitType CurrentUnitType;
+        public CellType CurrentUnitType;
         
         [Header("Prefabs Configuration")]
         [SerializeField] private List<UnitMapping> unitMappings;
         
-        private static readonly Dictionary<UnitType, GameObject> UnitTypeToPrefab = new();
-        public static IReadOnlyDictionary<UnitType, GameObject> Prefabs => UnitTypeToPrefab;
+        private static readonly Dictionary<CellType, GameObject> UnitTypeToPrefab = new();
+        public static IReadOnlyDictionary<CellType, GameObject> Prefabs => UnitTypeToPrefab;
         
         private void Awake()
+        {
+            RegisterPrefabs();
+        }
+        
+        // Called from Awake and again before instantiating: the Grid may run before this unit's Awake.
+        private void RegisterPrefabs()
         {
             if (UnitTypeToPrefab.Count != 0) return;
             foreach (var mapping in unitMappings.Where(mapping => mapping.prefab != null && !UnitTypeToPrefab.ContainsKey(mapping.type)))
@@ -32,18 +38,19 @@ namespace Grid
             }
         }
 
-        public void InitializeUnit()
+        // Instantiates the prefab for CurrentUnitType and returns it (null for an empty cell).
+        public GameObject InitializeUnit()
         {
-            if (CurrentUnitType == UnitType.Empty) return;
+            if (CurrentUnitType == CellType.Empty) return null;
             
+            RegisterPrefabs();
             if (UnitTypeToPrefab.TryGetValue(CurrentUnitType, out var prefabBase))
             {
-                var unitInstance = Instantiate(prefabBase, transform.position, prefabBase.transform.rotation);
+                return Instantiate(prefabBase, transform.position, prefabBase.transform.rotation);
             }
-            else
-            {
-                Debug.LogError($"O prefab para o tipo '{CurrentUnitType}' não foi configurado ou encontrado no dicionário!");
-            }
+           
+            Debug.LogError($"O prefab para o tipo '{CurrentUnitType}' não foi configurado ou encontrado no dicionário!");
+            return null;
         }
     }
 }

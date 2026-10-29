@@ -10,10 +10,22 @@ public class RoomManager : MonoBehaviour
     [Header("Room Settings")]
     public float SurviveTime = 120f;
     
+    [Tooltip("When checked, uses the SurviveTime above instead of the one from the genome (useful for quick tests).")]
+    public bool OverrideSurviveTime = false;
+        
     public TextMeshProUGUI CountdownText;
     
     private bool _isRoomCompleted = false;
 
+    private void Start()
+    {
+        var room = RunManager.Instance.CurrentRoom;
+        if (!OverrideSurviveTime && room != null)
+        {
+            SurviveTime = room.Settings.SurviveTime;
+        }
+    }
+    
     private void Update()
     {
         if (_isRoomCompleted) return;

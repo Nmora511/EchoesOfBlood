@@ -1,83 +1,120 @@
-using System;
+using System.Linq;
+using Evolution.Rooms;
 using UnityEngine;
 
 namespace Grid
 {
-    [System.Serializable]
-    public class GridRow
-    {
-        public GridUnit.UnitType[] columns = new GridUnit.UnitType[9];
-        
-        public GridUnit.UnitType this[int index]
-        {
-            get => columns[index];
-            set => columns[index] = value;
-        }
-    }
-    
+    // Builds the room from the RoomPlan given by RunManager:
+    // turns blocks on/off according to the shape, fills the cells from the genome and closes the borders with walls.
+    // Everything happens in Awake, so the NavMesh (built in DynamicNavMesh.Start) already sees the final room.   
     public class Grid : MonoBehaviour
     {
-        [SerializeField] 
-        private GridRow[] gridRows = new GridRow[9];
-     
-        public GridRow[] GridTypes => gridRows;
+        [Header("Walls")]
+        [Tooltip("Optional. A 1x1x1 cube-like prefab, scaled to fit each wall. Empty = plain Unity cube.")]
+        [SerializeField] private GameObject wallPrefab;
+        [SerializeField] private bool buildWalls = true;
+        [SerializeField] private float wallHeight = 1f;
+        [SerializeField] private float wallThickness = 0.5f;
         
-        private GridBlock[] _gridBlocks;
-        private void Start()
+        private GridBlock[] _blocks;
+        
+        private void Awake()
         {
-            _gridBlocks = GetComponentsInChildren<GridBlock>();
-            if (_gridBlocks.Length < 9)
+            _blocks = GetComponentsInChildren<GridBlock>(true).OrderBy(GridSort.Row).ThenBy(GridSort.Column).ToArray();
+            if (_blocks.Length != RoomLayout.BlockCount)
             {
-                Debug.LogError($"Grid does not contain 9 blocks, {gameObject.name}");
+                Debug.LogError($"Grid must contain {RoomLayout.BlockCount} blocks, found {_blocks.Length}, {gameObject.name}");
                 return;
             }
             
-            DefineRoom();
-            
-            for (var i=0; i < 9; i++)
+            var room = RunManager.Instance.CurrentRoom;
+            if (room == null)
             {
-                if (GridTypes[i] == null || GridTypes[i].columns == null || GridTypes[i].columns.Length == 0)
-                {
-                    _gridBlocks[i].enabled = false;
-                    continue;
-                }
-                _gridBlocks[i].enabled = true;
-                _gridBlocks[i].unitTypes = GridTypes[i].columns;
-                _gridBlocks[i].InitializeBlock();
+                Debug.LogError("Grid: RunManager has no room for this scene.");
+                return;
             }
-        }
-
-        private void DefineRoom()
-        {
-            var E = GridUnit.UnitType.Empty;
-            var T = GridUnit.UnitType.ThornTrap;
-            var S = GridUnit.UnitType.StakesTrap;
-            var G = GridUnit.UnitType.GroundEnemySpawner;
-            var R = GridUnit.UnitType.RangedEnemySpawner;
             
-            var rawLayout = new GridUnit.UnitType[][]
+            if (RunManager.Instance.Config.LogRoomLayout)
             {
-                new [] { G, E, E, E, E, E, E, T, E },
-                new [] { E, S, E, E, E, E, E, S, E },
-                new [] { E, E, T, E, G, E, E, R, E },
-                new [] { E, E, E, E, E, E, E, E, E },
-                new [] { E, R, E, S, E, T, E, E, E },
-                new [] { E, E, E, E, E, G, S, E, T },
-                new [] { E, T, E, E, E, E, G, E, E },
-                new [] { E, E, E, S, E, E, E, E, E },
-                new [] { T, E, E, E, E, E, E, E, R }
-            };
-
-            InitiateGridTypes(rawLayout);
+                Debug.Log($"[Grid] Room {RunManager.Instance.RoomIndex + 1} shape {RoomShape.Describe(room.Shape)}\n" +
+                          room.Describe() + JsonUtility.ToJson(room.Settings, true));
+            }
+            
+            for (var b = 0; b < RoomLayout.BlockCount; b++)
+            {
+                _blocks[b].gameObject.SetActive(room.Shape[b]);
+                if (room.Shape[b])
+                {
+                    _blocks[b].InitializeBlock(room, b);
+                }
+            }
+            
+            if (buildWalls)
+            {
+                BuildWalls(room.Shape);
+            }
         }
         
-        private void InitiateGridTypes(GridUnit.UnitType[][] rawLayout)
+        private void BuildWalls(bool[] shape)
         {
-            for (var i = 0; i < 9; i++)
+            var cellSize = _blocks[4].CellSize;
+            var blockSize = cellSize * RoomLayout.BlocksPerSide;
+            var parent = new GameObject("Walls").transform;
+            parent.SetParent(transform, true);
+
+            for (var b = 0; b < RoomLayout.BlockCount; b++)
             {
-                gridRows[i] ??= new GridRow();
-                gridRows[i].columns = rawLayout[i];
+                if (!shape[b]) continue;
+
+                var row = b / RoomLayout.BlocksPerSide;
+                var col = b % RoomLayout.BlocksPerSide;
+                var center = _blocks[b].Center;
+
+                TryWall(parent, shape, center, blockSize, cellSize, row - 1, col, Vector3.forward, isDoorSide: false);
+                TryWall(parent, shape, center, blockSize, cellSize, row + 1, col, Vector3.back, isDoorSide: false);
+                TryWall(parent, shape, center, blockSize, cellSize, row, col - 1, Vector3.left, b == RoomLayout.EntranceBlock);
+                TryWall(parent, shape, center, blockSize, cellSize, row, col + 1, Vector3.right, b == RoomLayout.ExitBlock);
             }
+        }
+        
+        // Places a wall on one side of a block when there is no active block on that side.
+        private void TryWall(Transform parent, bool[] shape, Vector3 center, float blockSize, float cellSize,
+            int neighborRow, int neighborCol, Vector3 side, bool isDoorSide)
+        {
+            var isNeighborValid = neighborRow is >= 0 and < RoomLayout.BlocksPerSide &&
+                         neighborCol is >= 0 and < RoomLayout.BlocksPerSide;
+            var isNeighborActivated = shape[neighborRow * RoomLayout.BlocksPerSide + neighborCol];
+            if (isNeighborValid && isNeighborActivated) return;
+
+            var sideCenter = center + side * (blockSize / 2f);
+            var along = Vector3.Cross(Vector3.up, side); // direction the wall runs in
+
+            if (!isDoorSide)
+            {
+                CreateWall(parent, sideCenter, along, blockSize + wallThickness);
+                return;
+            }
+
+            // Door side: leave the middle cell open for the door.
+            CreateWall(parent, sideCenter + along * cellSize, along, cellSize + wallThickness);
+            CreateWall(parent, sideCenter - along * cellSize, along, cellSize + wallThickness);
+        }
+        
+        private void CreateWall(Transform parent, Vector3 position, Vector3 along, float length)
+        {
+            var wall = wallPrefab is not null ? Instantiate(wallPrefab) : GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wall.name = "Wall";
+            wall.transform.SetParent(parent, true);
+            wall.transform.position = position + Vector3.up * (wallHeight / 2f);
+            wall.transform.rotation = Quaternion.LookRotation(along, Vector3.up);
+            wall.transform.localScale = new Vector3(wallThickness, wallHeight, length);
+        }
+        
+        // Sorting keys shared by Grid and GridBlock: row 0 is the top (largest z), column 0 is the left (smallest x).
+        public static class GridSort
+        {
+            public static float Row(Component c) => -Mathf.Round(c.transform.position.z * 10f);
+            public static float Column(Component c) => Mathf.Round(c.transform.position.x * 10f);
         }
     }
 }

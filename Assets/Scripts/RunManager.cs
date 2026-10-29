@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Evolution.Rooms;
 
 // Controls the scene sequence of a run: 5x Default_Room, then Boss_Room.
 public class RunManager : MonoBehaviour
@@ -11,13 +12,20 @@ public class RunManager : MonoBehaviour
 
     public static RunManager Instance { get; private set; }
 
+    public GameBalanceConfig Config { get; private set; }
+    
     // 0..4 = regular rooms, 5 = boss room.
     public int RoomIndex { get; private set; }
     public int RunNumber { get; private set; } = 1;
     public bool IsBossRoom => RoomIndex >= RoomsPerRun;
 
-    private readonly List<string> _roomResults = new();
+// The room the current Default_Room must build (null in the boss room).
+    public RoomPlan CurrentRoom => IsBossRoom ? null : _plan.Rooms[RoomIndex];
 
+    private readonly List<string> _roomResults = new();
+    private RunPlan _plan;
+    private System.Random _rng;
+    
     // Unity calls this method automatically on Play, before any scene is loaded.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Bootstrap()
@@ -37,6 +45,19 @@ public class RunManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        Config = Resources.Load<GameBalanceConfig>("GameBalanceConfig");
+        if (Config is null)
+        {
+            Debug.LogWarning("[RunManager] Assets/Resources/GameBalanceConfig not found, using default values.");
+            Config = ScriptableObject.CreateInstance<GameBalanceConfig>();
+        }
+
+        var seed = Config.Seed >= 0 ? Config.Seed : System.Environment.TickCount;
+        _rng = new System.Random(seed);
+        Debug.Log($"[RunManager] Seed: {seed}");
+
+        CreatePlan();
+        
         // Allows pressing Play directly in Boss_Room to test the boss.
         RoomIndex = SceneManager.GetActiveScene().name == BossScene ? RoomsPerRun : 0;
     }
@@ -75,6 +96,12 @@ public class RunManager : MonoBehaviour
         RunNumber++;
         RoomIndex = 0;
         _roomResults.Clear();
+        CreatePlan();
         SceneManager.LoadScene(RoomScene);
+    }
+    
+    private void CreatePlan()
+    {
+        _plan = RunPlan.CreateRandom(_rng, Config.RoomRanges, Config.RepairRules, Config.MinBlocksPerRoom);
     }
 }
