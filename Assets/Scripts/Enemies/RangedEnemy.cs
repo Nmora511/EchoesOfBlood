@@ -10,18 +10,21 @@ namespace Enemies
         
         public float ArrowForce;
 
+        protected override bool TracksTargetWhileAttacking => true;
+        
         private LayerMask _playerLayerMask;
 
         private void Awake()
         {
             _playerLayerMask= LayerMask.GetMask("Player");
             Attacked += Charge;
+            AttackFinished += Shoot;
         }
 
+        // Starts the charge animation. The arrow is only shot when the cooldown ends (AttackFinished)
         private void Charge()
         {
             animator.SetTrigger(HasAttacked);
-            Shoot();
         }
         
         private void Shoot()

@@ -196,6 +196,7 @@ MonoBehaviour:
   DamageHitbox: {fileID: 7127924320275799996}
   AttackAngle: 15
   HitAnimationDuration: 1.5
+  AttackClip: {fileID: 7400000, guid: 5b7338d405e1b91808b2a56f7399770f, type: 2}
   ViewRadius: 15
   ViewAngle: 150
   ProximityRadius: 3

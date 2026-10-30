@@ -39,7 +39,7 @@ MonoBehaviour:
       Min: 0.5
       Max: 2
     SurviveTime:
-      Min: 45
+      Min: 30
       Max: 120
   RepairRules:
     MinSpawners: 1

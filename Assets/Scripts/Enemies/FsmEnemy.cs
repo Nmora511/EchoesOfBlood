@@ -8,6 +8,7 @@ namespace Enemies
     {
         private static readonly int IsChasing = Animator.StringToHash("isChasing");
         private static readonly int WasHit = Animator.StringToHash("wasHit");
+        private static readonly int AttackSpeed = Animator.StringToHash("attackSpeed");
 
         // The Finite State Machine (FSM)
         public enum EnemyState { Idle, Chasing, Investigating, Attacking, Hit, Dead }
@@ -21,6 +22,9 @@ namespace Enemies
         public AttackHitbox DamageHitbox;
         public float AttackAngle = 15f;
         public float HitAnimationDuration = 1.5f;
+        [Tooltip("Attack animation clip. Its speed is scaled so it lasts exactly AttackCooldown.")]
+        public AnimationClip AttackClip;
+
         
         [Header("Vision & Senses Settings")]
         public float ViewRadius = 20f; 
@@ -34,6 +38,9 @@ namespace Enemies
         public float InvestigationOvershoot = 1.5f;
         
         protected event Action Attacked;
+        protected event Action AttackFinished;
+        
+        protected virtual bool TracksTargetWhileAttacking => false;
         
         private float _attackTimer;
         private float _hitAnimationTimer;
@@ -103,7 +110,6 @@ namespace Enemies
                     navMeshAgent.isStopped = false;
                     navMeshAgent.SetDestination(Target.position);
                     
-                
                     CalculateLastKnownPosition();
                     _previousPlayerPosition = Target.position;
 
@@ -122,6 +128,7 @@ namespace Enemies
                         CurrentState = EnemyState.Attacking;
                         _attackTimer = AttackCooldown;
                         animator.SetBool(IsChasing, false);
+                        UpdateAttackAnimationSpeed();
                         Attacked?.Invoke();
                     } 
                 
@@ -149,10 +156,12 @@ namespace Enemies
                     {
                         navMeshAgent.isStopped = true;
                         CalculateLastKnownPosition();
+                        if (TracksTargetWhileAttacking) RotateTowards(Target.position);
                     }
                     else
                     {
                         CurrentState = EnemyState.Idle;
+                        AttackFinished?.Invoke();
                     }
                     break;
 
@@ -176,6 +185,14 @@ namespace Enemies
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+        
+        // Makes the attack animation last exactly AttackCooldown (shorter cooldown = faster animation).
+        // Requires the float parameter "attackSpeed" as the Speed Multiplier of the attack state in the Animator.
+        private void UpdateAttackAnimationSpeed()
+        {
+            if (AttackClip is null || AttackCooldown <= 0f) return;
+            animator.SetFloat(AttackSpeed, AttackClip.length / AttackCooldown);
         }
 
         private bool CanSeePlayer()

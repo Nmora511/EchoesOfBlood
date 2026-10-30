@@ -127,6 +127,13 @@ MonoBehaviour:
   KnockbackForce: 15
   KnockbackFriction: 5
   Target: {fileID: 0}
+  CurrentState: 0
+  AttackCooldown: 2
+  AttackDamage: 20
+  DamageHitbox: {fileID: 1674707303582628195, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
+  AttackAngle: 1
+  HitAnimationDuration: 1.5
+  AttackClip: {fileID: 7400000, guid: 5b7338d405e1b91808b2a56f7399770f, type: 2}
   ViewRadius: 35
   ViewAngle: 150
   ProximityRadius: 20
@@ -135,12 +142,6 @@ MonoBehaviour:
     m_Bits: 1
   EyeOffset: {x: 0, y: 1, z: 0}
   InvestigationOvershoot: 1.5
-  CurrentState: 0
-  AttackCooldown: 2
-  AttackDamage: 20
-  DamageHitbox: {fileID: 1674707303582628195, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
-  AttackAngle: 1
-  HitAnimationDuration: 1.5
   ArrowObject: {fileID: 4288195627525023967, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
   ArrowForce: 45
 --- !u!65 &4199660822738139122
