@@ -33,8 +33,8 @@ MonoBehaviour:
       Min: 1.5
       Max: 4
     RangedAttackCooldown:
-      Min: 1.5
-      Max: 5
+      Min: 3
+      Max: 8
     TrapDamageMultiplier:
       Min: 0.5
       Max: 2

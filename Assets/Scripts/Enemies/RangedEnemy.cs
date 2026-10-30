@@ -4,6 +4,8 @@ namespace Enemies
 {
     public class RangedEnemy : FsmEnemy
     {
+        private static readonly int HasAttacked = Animator.StringToHash("hasAttacked");
+
         public Rigidbody ArrowObject;
         
         public float ArrowForce;
@@ -13,9 +15,16 @@ namespace Enemies
         private void Awake()
         {
             _playerLayerMask= LayerMask.GetMask("Player");
+            Attacked += Charge;
+        }
+
+        private void Charge()
+        {
+            animator.SetTrigger(HasAttacked);
+            Shoot();
         }
         
-        public void Shoot()
+        private void Shoot()
         {
             var shootRay =  new Ray(transform.position, transform.forward);
 

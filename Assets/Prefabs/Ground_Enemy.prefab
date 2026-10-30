@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 4949662729556058622}
   - component: {fileID: 3147356861881224953}
   - component: {fileID: 3065333393581551679}
-  - component: {fileID: 4379065524207697563}
+  - component: {fileID: 1154021388415674088}
   - component: {fileID: 873160265917530473}
   - component: {fileID: 8155328415667782690}
   m_Layer: 7
@@ -173,7 +173,7 @@ CapsuleCollider:
   m_Height: 3
   m_Direction: 1
   m_Center: {x: 0, y: 0.39, z: 0}
---- !u!114 &4379065524207697563
+--- !u!114 &1154021388415674088
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -182,14 +182,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 4251343949696175326}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 274638ff7c56bc24cb16d8a731af8c33, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d08395383f95e5269acf5ced3c6e7b5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FollowingEnemy
+  m_EditorClassIdentifier: Assembly-CSharp::Enemies.MeleeEnemy
   HealthPoints: 50
   InvulnerabilityDuration: 1
   KnockbackForce: 15
   KnockbackFriction: 5
   Target: {fileID: 0}
+  CurrentState: 0
+  AttackCooldown: 2.7
+  AttackDamage: 20
+  DamageHitbox: {fileID: 7127924320275799996}
+  AttackAngle: 15
+  HitAnimationDuration: 1.5
   ViewRadius: 15
   ViewAngle: 150
   ProximityRadius: 3
@@ -198,12 +204,6 @@ MonoBehaviour:
     m_Bits: 1
   EyeOffset: {x: 0, y: 1, z: 0}
   InvestigationOvershoot: 1.5
-  CurrentState: 0
-  AttackCooldown: 2.7
-  AttackDamage: 20
-  DamageHitbox: {fileID: 7127924320275799996}
-  AttackAngle: 15
-  HitAnimationDuration: 1.5
 --- !u!54 &873160265917530473
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -4,16 +4,16 @@ namespace Enemies
 {
     public class MeleeEnemy : FsmEnemy
     {
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
-        {
+        private static readonly int HasAttacked = Animator.StringToHash("hasAttacked");
         
+        private void Awake()
+        {
+            Attacked += Attack;
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Attack()
         {
-        
+            animator.SetTrigger(HasAttacked);
         }
     }
 }

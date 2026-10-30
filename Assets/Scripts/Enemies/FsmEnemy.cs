@@ -7,7 +7,6 @@ namespace Enemies
     public class FsmEnemy : Enemy
     {
         private static readonly int IsChasing = Animator.StringToHash("isChasing");
-        private static readonly int HasAttacked = Animator.StringToHash("hasAttacked");
         private static readonly int WasHit = Animator.StringToHash("wasHit");
 
         // The Finite State Machine (FSM)
@@ -34,6 +33,8 @@ namespace Enemies
         public Vector3 EyeOffset = new Vector3(0, 1f, 0);
         public float InvestigationOvershoot = 1.5f;
         
+        protected event Action Attacked;
+        
         private float _attackTimer;
         private float _hitAnimationTimer;
         
@@ -53,6 +54,8 @@ namespace Enemies
             base.Start();
             _originalStoppingDistance = navMeshAgent.stoppingDistance;
             DamageHitbox.Damage = AttackDamage;
+
+            _attackTimer = AttackCooldown;
         }
 
         protected override void Update()
@@ -119,12 +122,7 @@ namespace Enemies
                         CurrentState = EnemyState.Attacking;
                         _attackTimer = AttackCooldown;
                         animator.SetBool(IsChasing, false);
-                        animator.SetTrigger(HasAttacked);
-
-                        if (this is RangedEnemy rangedEnemy)
-                        {
-                            rangedEnemy.Shoot();
-                        }
+                        Attacked?.Invoke();
                     } 
                 
                     break;

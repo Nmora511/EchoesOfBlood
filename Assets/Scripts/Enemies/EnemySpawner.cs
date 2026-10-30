@@ -26,6 +26,7 @@ namespace Enemies
             _isConfigured = true;
             SpawnInterval = settings.SpawnInterval;
             MaxAlive = settings.MaxAlive;
+            _spawnTimer = 5f;
         }
         
         private void Update()

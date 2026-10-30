@@ -108,7 +108,6 @@ namespace Grid
             wall.transform.position = position + Vector3.up * (wallHeight / 2f);
             wall.transform.rotation = Quaternion.LookRotation(along, Vector3.up);
             wall.transform.localScale = new Vector3(wallThickness, wallHeight, length);
-            Debug.Log(wallHeight);
         }
         
         // Sorting keys shared by Grid and GridBlock: row 0 is the top (largest z), column 0 is the left (smallest x).
