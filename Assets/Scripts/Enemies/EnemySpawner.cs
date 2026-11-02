@@ -1,4 +1,5 @@
 using Evolution.Rooms;
+using Telemetry;
 using UnityEngine;
 using PlayerClass = Player.Player;
 
@@ -73,12 +74,14 @@ namespace Enemies
             }
 
             _aliveCount++;
-            enemy.Died += OnEnemyDied;
+            enemy.Died += () => OnEnemyDied(enemy);
+            GameTelemetry.EnemySpawned(enemy);
         }
         
-        private void OnEnemyDied()
+        private void OnEnemyDied(Enemy enemy)
         {
             _aliveCount = Mathf.Max(0, _aliveCount - 1);
+            GameTelemetry.EnemyDied(enemy);
         }
         
         public void StopSpawning()

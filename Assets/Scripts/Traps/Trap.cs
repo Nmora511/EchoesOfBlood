@@ -1,4 +1,6 @@
+using Telemetry;
 using UnityEngine;
+using PlayerClass = Player.Player;
 
 namespace Traps
 {
@@ -24,6 +26,8 @@ namespace Traps
             var entityCollided = other.GetComponent<Entity>();
             if (entityCollided == null) return;
         
+            if (entityCollided is PlayerClass) GameTelemetry.TrapStepped(DamageHitbox.Source);
+            
             if (_entitiesOnTrap == 0)
             {
                 _animator.SetTrigger(WasActivated);

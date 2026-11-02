@@ -1,8 +1,9 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Evolution.Telemetry;
+using Telemetry;
 
 // TODO: Attack and Animations (All code is commented)
 namespace Player
@@ -249,6 +250,7 @@ namespace Player
             
             _animator.SetTrigger(HasAttacked);
             _isAttacking = true;
+            GameTelemetry.PlayerAttacked();
         }
 
         private void UpdateAttackStatus()
@@ -261,6 +263,18 @@ namespace Player
             
             _isAttacking = false;
             _attackCooldown = AttackDuration;
+        }
+        
+        // Hit that knows what caused it. Used by every hitbox that can hurt the player, so the telemetry knows the damage by source.
+        public bool OnHit(float damage, Vector3 attackerPosition, DamageSource source)
+        {
+            var healthBefore = HealthPoints;
+            var wasHit = OnHit(damage, attackerPosition);
+
+            // Only the health actually lost counts (a 15 damage hit on 10 HP counts as 10).
+            var lost = Mathf.Max(healthBefore, 0f) - Mathf.Max(HealthPoints, 0f);
+            if (lost > 0f) GameTelemetry.PlayerDamaged(source, lost);
+            return wasHit;
         }
 
         public override void Death()

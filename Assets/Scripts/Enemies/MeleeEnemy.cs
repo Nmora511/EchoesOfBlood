@@ -1,3 +1,4 @@
+using Evolution.Telemetry;
 using UnityEngine;
 
 namespace Enemies
@@ -5,6 +6,8 @@ namespace Enemies
     public class MeleeEnemy : FsmEnemy
     {
         private static readonly int HasAttacked = Animator.StringToHash("hasAttacked");
+        
+        protected override DamageSource AttackSource => DamageSource.GroundEnemy;
         
         private void Awake()
         {

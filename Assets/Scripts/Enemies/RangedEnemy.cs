@@ -1,3 +1,4 @@
+using Evolution.Telemetry;
 using UnityEngine;
 
 namespace Enemies
@@ -11,6 +12,7 @@ namespace Enemies
         public float ArrowForce;
 
         protected override bool TracksTargetWhileAttacking => true;
+        protected override DamageSource AttackSource => DamageSource.Arrow;
         
         private LayerMask _playerLayerMask;
 

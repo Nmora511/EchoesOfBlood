@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Linq;
 using Enemies;
 using Evolution.Rooms;
+using Evolution.Telemetry;
 using Traps;
 
 
@@ -64,10 +65,10 @@ namespace Grid
             switch (cellType)
             {
                 case CellType.ThornTrap:
-                    MultiplyTrapDamage(instance, settings.ThornDamageMultiplier);
+                    ConfigureTrap(instance, settings.ThornDamageMultiplier, DamageSource.ThornTrap);
                     break;
                 case CellType.StakesTrap:
-                    MultiplyTrapDamage(instance, settings.StakesDamageMultiplier);
+                    ConfigureTrap(instance, settings.StakesDamageMultiplier, DamageSource.StakesTrap);
                     break;
                 case CellType.GroundEnemySpawner:
                     instance.GetComponent<EnemySpawner>().Configure(settings.Ground);
@@ -82,10 +83,13 @@ namespace Grid
             }
         }
 
-        private static void MultiplyTrapDamage(GameObject instance, float multiplier)
+        private static void ConfigureTrap(GameObject instance, float multiplier, DamageSource source)
         {
             var trap = instance.GetComponentInChildren<Trap>();
-            if (trap != null) trap.Damage *= multiplier;
+            if (trap == null) return;
+
+            trap.Damage *= multiplier;
+            if (trap.DamageHitbox != null) trap.DamageHitbox.Source = source;
         }
     }
 }

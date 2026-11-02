@@ -1,4 +1,5 @@
 using System;
+using Evolution.Telemetry;
 using UnityEngine;
 using PlayerClass = Player.Player;
 
@@ -42,6 +43,8 @@ namespace Enemies
         
         protected virtual bool TracksTargetWhileAttacking => false;
         
+        protected virtual DamageSource AttackSource => DamageSource.Unknown;
+        
         private float _attackTimer;
         private float _hitAnimationTimer;
         
@@ -61,6 +64,7 @@ namespace Enemies
             base.Start();
             _originalStoppingDistance = navMeshAgent.stoppingDistance;
             DamageHitbox.Damage = AttackDamage;
+            DamageHitbox.Source = AttackSource;
 
             _attackTimer = AttackCooldown;
         }
