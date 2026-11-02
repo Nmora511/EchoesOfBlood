@@ -125,6 +125,7 @@ namespace Player
                 _dashTimer = DashDuration;
                 _dashCooldownTimer = DashCooldown;
                 _animator.SetTrigger(HasDashed);
+                GameTelemetry.PlayerDashed();
             }
         }
         
