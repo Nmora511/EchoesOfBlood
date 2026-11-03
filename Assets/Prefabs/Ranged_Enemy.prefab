@@ -129,7 +129,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   CurrentState: 0
   AttackCooldown: 2
-  AttackDamage: 20
+  AttackDamage: 10
   DamageHitbox: {fileID: 1674707303582628195, guid: b0c8ba26513262107b0b609e3003079d, type: 3}
   AttackAngle: 1
   HitAnimationDuration: 1.5
