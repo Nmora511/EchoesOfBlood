@@ -38,7 +38,8 @@ namespace Evolution.Telemetry
 
         // ---- Player actions ----
         public int Attacks;
-        public int AttackHits;          // one swing that hits two enemies counts twice
+        public int AttackHits;          // swings that hit at least one enemy (never more than Attacks)
+        public int EnemiesHit;          // enemies hit; one swing that hits two enemies counts twice here
         public float DamageDealt;
         public int Dashes;
         public float DistanceTraveled;
@@ -78,11 +79,12 @@ namespace Evolution.Telemetry
             if (!IsFinished) Attacks++;
         }
 
-        public void RecordAttackHit(float damage)
+        public void RecordAttackHit(float damage, bool firstHitOfThisAttack)
         {
             if (IsFinished) return;
-            AttackHits++;
+            EnemiesHit++;
             DamageDealt += damage;
+            if (firstHitOfThisAttack) AttackHits++;
         }
 
         public void RecordDash()
@@ -182,7 +184,7 @@ namespace Evolution.Telemetry
             text.Append($"  Enemies: ground {EnemiesKilled[0]}/{EnemiesSpawned[0]} killed, ranged {EnemiesKilled[1]}/{EnemiesSpawned[1]} killed, ");
             text.Append($"alive avg={AverageEnemiesAlive:0.0} max={MaxEnemiesAlive}, near time={TimeNearEnemies:0.0}s\n");
 
-            text.Append($"  Player: attacks={Attacks} hits={AttackHits} ({HitRate:P0}), dashes={Dashes}, ");
+            text.Append($"  Player: attacks={Attacks} landed={AttackHits} ({HitRate:P0}) enemies hit={EnemiesHit}, dashes={Dashes}, ");
             text.Append($"moved={DistanceTraveled:0}m, still={TimeStill:0.0}s");
             return text.ToString();
         }
@@ -233,6 +235,7 @@ namespace Evolution.Telemetry
             json.Field("TimeNearEnemies", TimeNearEnemies);
             json.Field("Attacks", Attacks);
             json.Field("AttackHits", AttackHits);
+            json.Field("EnemiesHit", EnemiesHit);
             json.Field("DamageDealt", DamageDealt);
             json.Field("Dashes", Dashes);
             json.Field("DistanceTraveled", DistanceTraveled);

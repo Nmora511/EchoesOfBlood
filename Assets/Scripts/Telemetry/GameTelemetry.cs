@@ -24,6 +24,7 @@ namespace Telemetry
         private static Vector3 _lastPlayerPosition;
         private static bool _hasLastPosition;
         private static bool _warnedUnknownSource;
+        private static bool _attackLanded;
 
         // Statics survive between Plays when Domain Reload is off, so they are cleared here.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -32,6 +33,7 @@ namespace Telemetry
             CurrentRoom = null;
             AliveEnemies.Clear();
             _hasLastPosition = false;
+            _attackLanded = false;
             _warnedUnknownSource = false;
         }
 
@@ -42,6 +44,7 @@ namespace Telemetry
         {
             AliveEnemies.Clear();
             _hasLastPosition = false;
+            _attackLanded = false;
 
             if (config != null)
             {
@@ -105,12 +108,16 @@ namespace Telemetry
 
         public static void PlayerAttacked()
         {
-            if (IsRecording) CurrentRoom.RecordAttack();
+            if (!IsRecording) return;
+            CurrentRoom.RecordAttack();
+            _attackLanded = false;
         }
 
         public static void PlayerHitEnemy(float damage)
         {
-            if (IsRecording) CurrentRoom.RecordAttackHit(damage);
+            if (!IsRecording) return;
+            CurrentRoom.RecordAttackHit(damage, !_attackLanded);
+            _attackLanded = true;
         }
 
         public static void PlayerDashed()
