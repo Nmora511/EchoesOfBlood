@@ -20,7 +20,7 @@ namespace Player
         [Header("Combat Settings")] 
         public float AttackDamage;
         public ScytheHitbox ScytheHitbox;
-        public float AttackDuration = 0.67f;
+        public float AttackDuration = 0.27f;
         public float AttackSlideFriction = 4f;
         
         [Header("Movement Settings")]
@@ -149,6 +149,18 @@ namespace Player
                 return; 
             }
             
+            // Walking Handler
+            // Fixes movimentation based on camera angle
+            var camForward = _mainCamera.transform.forward;
+            var camRight = _mainCamera.transform.right;
+
+            camForward.y = 0f;
+            camRight.y = 0f;
+            camForward.Normalize();
+            camRight.Normalize();
+
+            _inputDirection = (camForward * _moveInput.y + camRight * _moveInput.x).normalized;
+            
             // Dash Handler
             if (_dashCooldownTimer > 0f)
             {
@@ -164,7 +176,7 @@ namespace Player
                 }
                 else
                 {
-                    _finalVelocity = transform.forward * DashSpeed;
+                    _finalVelocity = _inputDirection * DashSpeed;
                     return;
                 }
             }
@@ -174,19 +186,8 @@ namespace Player
                 _finalVelocity = Vector3.Lerp(_finalVelocity, Vector3.zero, Time.deltaTime * AttackSlideFriction);
                 return;
             }
-
-            // Walking Handler
-            // Fixes movimentation based on camera angle
-            var camForward = _mainCamera.transform.forward;
-            var camRight = _mainCamera.transform.right;
-
-            camForward.y = 0f;
-            camRight.y = 0f;
-            camForward.Normalize();
-            camRight.Normalize();
-
-            _inputDirection = (camForward * _moveInput.y + camRight * _moveInput.x).normalized;
         
+            // Walking
             var currentSpeed = 0f;
 
             if (_inputDirection != Vector3.zero) //&& (!isAttacking ))
