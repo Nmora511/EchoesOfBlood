@@ -1,3 +1,4 @@
+using Evolution;
 using Evolution.Rooms;
 using UnityEngine;
 
@@ -13,6 +14,9 @@ public class GameBalanceConfig : ScriptableObject
 
     [Header("Room Repair")]
     public RepairRules RepairRules = new RepairRules();
+
+    [Header("Evolution (GA, fitness, player model)")]
+    public EvolutionSettings EvolutionSettings = new EvolutionSettings();
 
     [Header("Random")]
     [Tooltip("-1 = a new seed every run. Any other value makes the runs repeatable.")]

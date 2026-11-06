@@ -70,5 +70,22 @@ namespace Evolution.Rooms
             }
             return plan;
         }
+
+        // The run to be played from an evolved individual and the shapes it was evolved for.
+        public static RunPlan FromGenome(RunGenome run, bool[][] shapes, RoomAttributeRanges ranges)
+        {
+            var plan = new RunPlan();
+            for (var i = 0; i < RoomCount; i++)
+            {
+                var genome = run.Rooms[i].Clone();
+                plan.Rooms[i] = new RoomPlan
+                {
+                    Genome = genome,
+                    Shape = (bool[])shapes[i].Clone(),
+                    Settings = ranges.Decode(genome)
+                };
+            }
+            return plan;
+        }
     }
 }
