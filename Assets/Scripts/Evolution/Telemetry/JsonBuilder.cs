@@ -4,11 +4,16 @@ using System.Text;
 namespace Evolution.Telemetry
 {
     // Minimal JSON writer, so the core does not depend on JsonUtility or Newtonsoft.
-    // Only what the telemetry needs: objects, arrays, numbers, bools and strings.
+    // Only what the telemetry and the save file need: objects, arrays, numbers, bools and strings.
+    // JsonNode (Evolution/Persistence) reads it back.
     public class JsonBuilder
     {
         private readonly StringBuilder _text = new StringBuilder();
         private bool _needsComma;
+
+        // false (default): numbers with at most 4 decimals, good for reading the logs.
+        // true: numbers written so that reading them back gives exactly the same value (used by the save file).
+        public bool ExactNumbers { get; set; }
 
         public void BeginObject(string name = null)
         {
@@ -37,15 +42,19 @@ namespace Evolution.Telemetry
         }
 
         // Appends an already built JSON value (for example another object's ToJson()).
-        public void RawValue(string json)
+        public void RawValue(string json) => RawField(null, json);
+
+        // Same, as a named field of the current object.
+        public void RawField(string name, string json)
         {
-            Key(null);
+            Key(name);
             _text.Append(json);
             _needsComma = true;
         }
 
         public void Field(string name, int value) => Value(name, value.ToString(CultureInfo.InvariantCulture));
         public void Field(string name, float value) => Value(name, Number(value));
+        public void Field(string name, double value) => Value(name, Number(value));
         public void Field(string name, bool value) => Value(name, value ? "true" : "false");
         public void Field(string name, string value) => Value(name, value == null ? "null" : Quote(value));
 
@@ -67,6 +76,42 @@ namespace Evolution.Telemetry
             EndArray();
         }
 
+        public void Field(string name, int[] values)
+        {
+            if (values == null)
+            {
+                Value(name, "null");
+                return;
+            }
+
+            BeginArray(name);
+            foreach (var v in values)
+            {
+                if (_needsComma) _text.Append(',');
+                _text.Append(v.ToString(CultureInfo.InvariantCulture));
+                _needsComma = true;
+            }
+            EndArray();
+        }
+
+        public void Field(string name, string[] values)
+        {
+            if (values == null)
+            {
+                Value(name, "null");
+                return;
+            }
+
+            BeginArray(name);
+            foreach (var v in values)
+            {
+                if (_needsComma) _text.Append(',');
+                _text.Append(v == null ? "null" : Quote(v));
+                _needsComma = true;
+            }
+            EndArray();
+        }
+
         public override string ToString() => _text.ToString();
 
         private void Value(string name, string raw)
@@ -83,10 +128,17 @@ namespace Evolution.Telemetry
         }
 
         // Invariant culture: a Brazilian Windows would otherwise write 1,5 instead of 1.5.
-        private static string Number(float value)
+        // "R" (round-trip) writes as many digits as needed to read back the very same float.
+        private string Number(float value)
         {
             if (float.IsNaN(value) || float.IsInfinity(value)) return "0";
-            return value.ToString("0.####", CultureInfo.InvariantCulture);
+            return value.ToString(ExactNumbers ? "R" : "0.####", CultureInfo.InvariantCulture);
+        }
+
+        private string Number(double value)
+        {
+            if (double.IsNaN(value) || double.IsInfinity(value)) return "0";
+            return value.ToString(ExactNumbers ? "R" : "0.######", CultureInfo.InvariantCulture);
         }
 
         private static string Quote(string value)

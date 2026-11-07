@@ -162,8 +162,13 @@ namespace Evolution.Tests
         [Test]
         public void Calibration_WithAlphaOne_ReproducesTheObservedDamage()
         {
-            var settings = new EvolutionSettings();
-            settings.Profile.Alpha = 1f;
+            var settings = new EvolutionSettings
+            {
+                Profile =
+                {
+                    RunAlpha = 1f
+                }
+            };
             var profile = PlayerProfile.CreateDefault(settings.Profile, settings.BaseStats);
             var model = new RoomDifficultyModel(settings.BaseStats, settings.Model);
             var ranges = new RoomAttributeRanges();
@@ -220,7 +225,7 @@ namespace Evolution.Tests
             var first = Run();
             var second = Run();
 
-            Assert.That(first.Generations[first.Generations.Count - 1].Best,
+            Assert.That(first.Generations[^1].Best,
                 Is.GreaterThan(first.Generations[0].Best));
             Assert.That(first.BestPrediction.Error, Is.LessThan(0.25f), "best run is far from the target curve");
             Assert.That(second.Population[0].Fitness, Is.EqualTo(first.Population[0].Fitness));

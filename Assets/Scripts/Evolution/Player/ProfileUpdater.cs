@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Evolution.Rooms;
 using Evolution.Telemetry;
 
@@ -14,31 +15,59 @@ namespace Evolution.PlayerModel
             DamageSource.GroundEnemy, DamageSource.Arrow, DamageSource.ThornTrap, DamageSource.StakesTrap
         };
 
-        // Call once per played room.
-        public static void UpdateFromRoom(PlayerProfile profile, RoomPlan played, RoomTelemetry telemetry,
+        // Call once per run with all the rooms played.
+        public static void UpdateFromRooms(PlayerProfile profile, IList<RoomPlan> plans, IList<RoomTelemetry> telemetries,
             RoomDifficultyModel model, ProfileSettings settings)
         {
-            if (profile == null || played == null || telemetry == null) return;
-            if (telemetry.PlayerMaxHealth > 0f) profile.PlayerMaxHealth = telemetry.PlayerMaxHealth;
+            if (profile == null || plans == null || telemetries == null) return;
+            var count = Math.Min(plans.Count, telemetries.Count);
+            if (count == 0) return;
 
+            for (var i = 0; i < count; i++)
+            {
+                if (telemetries[i].PlayerMaxHealth > 0f) profile.PlayerMaxHealth = telemetries[i].PlayerMaxHealth;
+            }
+
+            var alpha = AlphaForRun(profile.RunsObserved, settings);
+            
             // 1. Kill speed: lifetime of the enemies that died, divided by the health multiplier of the room.
-            UpdateLifetime(profile, EnemyKind.Ground, played.Settings.Ground.HealthMultiplier, telemetry, settings.Alpha);
-            UpdateLifetime(profile, EnemyKind.Ranged, played.Settings.Ranged.HealthMultiplier, telemetry, settings.Alpha);
+            UpdateLifetime(profile, EnemyKind.Ground, plans, telemetries, count, alpha);
+            UpdateLifetime(profile, EnemyKind.Ranged, plans, telemetries, count, alpha);
 
             // 2. Weights: real damage / exposure, using the time the player actually spent in the room.
-            var exposure = model.Exposure(played.Genome, played.Shape, played.Settings, profile, telemetry.TimeSurvived);
+            var damage = new float[TelemetryEnums.DamageSourceCount];
+            var exposure = new float[TelemetryEnums.DamageSourceCount];
+            for (var i = 0; i < count; i++)
+            {
+                var plan = plans[i];
+                var telemetry = telemetries[i];
+                var roomExposure = model.Exposure(plan.Genome, plan.Shape, plan.Settings, profile, telemetry.TimeSurvived);
+                foreach (var source in RoomSources)
+                {
+                    exposure[(int)source] += roomExposure[(int)source];
+                    damage[(int)source] += telemetry.DamageFraction(source);
+                }
+            }
+            
             foreach (var source in RoomSources)
             {
                 var e = exposure[(int)source];
-                if (e < settings.MinExposure) continue; // too little of this source to learn anything
+                if (e < settings.MinExposure) continue; // too little of this source in the run to learn anything
 
-                var observed = Clamp(telemetry.DamageFraction(source) / e, 0f, settings.MaxWeight);
-                profile.Weights[(int)source] = Lerp(profile.Weights[(int)source], observed, settings.Alpha);
+                var observed = Clamp(damage[(int)source] / e, 0f, settings.MaxWeight);
+                profile.Weights[(int)source] = Lerp(profile.Weights[(int)source], observed, alpha);
+            }
+            profile.RoomsObserved += count;
             }
 
-            profile.RoomsObserved++;
+        // A run with a single room (used by the tests).
+        public static void UpdateFromRoom(PlayerProfile profile, RoomPlan played, RoomTelemetry telemetry,
+            RoomDifficultyModel model, ProfileSettings settings)
+        {
+            if (played == null || telemetry == null) return;
+            UpdateFromRooms(profile, new[] { played }, new[] { telemetry }, model, settings);
         }
-
+        
         // Call once at the end of the run. Moves delta: down if the player died in a room,
         // up if all rooms were survived with health to spare.
         public static void UpdateFromRun(PlayerProfile profile, RunTelemetry run, ProfileSettings settings)
@@ -66,14 +95,32 @@ namespace Evolution.PlayerModel
             profile.RunsObserved++;
         }
 
-        private static void UpdateLifetime(PlayerProfile profile, EnemyKind kind, float healthMultiplier,
-            RoomTelemetry telemetry, float alpha)
+        private static void UpdateLifetime(PlayerProfile profile, EnemyKind kind, IList<RoomPlan> plans,
+            IList<RoomTelemetry> telemetries, int count, float alpha)
         {
             // Only enemies that died have a lifetime. Enemies still alive at the end are ignored
-            if (telemetry.EnemiesKilled[(int)kind] == 0 || healthMultiplier <= 0f) return;
+            var killed = 0;
+            var normalizedLifetime = 0f;
+            for (var i = 0; i < count; i++)
+            {
+                var spawner = kind == EnemyKind.Ground ? plans[i].Settings.Ground : plans[i].Settings.Ranged;
+                var kills = telemetries[i].EnemiesKilled[(int)kind];
+                if (kills == 0 || spawner.HealthMultiplier <= 0f) continue;
 
-            var observed = telemetry.AverageEnemyLifetime(kind) / healthMultiplier;
-            profile.BaseLifetime[(int)kind] = Lerp(profile.BaseLifetime[(int)kind], observed, alpha);
+                killed += kills;
+                normalizedLifetime += telemetries[i].KilledEnemyLifetime[(int)kind] / spawner.HealthMultiplier;
+            }
+            if (killed == 0) return;
+
+            profile.BaseLifetime[(int)kind] = Lerp(profile.BaseLifetime[(int)kind], normalizedLifetime / killed, alpha);
+        }
+
+        public static float AlphaForRun(int runsObserved, ProfileSettings settings)
+        {
+            if (settings.AlphaWarmupRuns <= 0 || runsObserved >= settings.AlphaWarmupRuns) return settings.RunAlpha;
+            var t = Math.Max(0, runsObserved) / (float)settings.AlphaWarmupRuns;
+            var warm = settings.FirstRunAlpha + (settings.RunAlpha - settings.FirstRunAlpha) * t;
+            return Math.Max(settings.RunAlpha, warm);
         }
 
         private static float Lerp(float from, float to, float t) => from + (to - from) * t;

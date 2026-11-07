@@ -45,5 +45,63 @@ MonoBehaviour:
     MinSpawners: 1
     MaxSpawners: 6
     DoorClearance: 1
+  EvolutionSettings:
+    RoomGa:
+      PopulationSize: 30
+      Generations: 50
+      Elitism: 2
+      TournamentSize: 3
+      CrossoverRate: 0.8
+      BlockCrossoverRate: 0.5
+      CellMutationRate: 0.0125
+      SwapMutationRate: 0.2
+      AttributeMutationRate: 0.2
+      AttributeSigma: 0.1
+      RandomImmigrants: 3
+      RandomEmptyChance: 0.75
+    RoomFitness:
+      TargetCurve:
+      - 0.2
+      - 0.3
+      - 0.4
+      - 0.5
+      - 0.6
+      LethalThreshold: 1
+      LethalPenalty: 1
+      NoveltyWeight: 0.05
+      RecentLayoutsKept: 15
+    Model:
+      TrapFarWeight: 0.3
+      CrowdCapacity: 3
+    Profile:
+      RunAlpha: 0.4
+      FirstRunAlpha: 0.7
+      AlphaWarmupRuns: 2
+      MinExposure: 0.05
+      MaxWeight: 1.5
+      DefaultEnemyWeight: 0.004
+      DefaultArrowWeight: 0.02
+      DefaultTrapWeight: 0.1
+      DefaultGroundLifetime: 10
+      DefaultRangedLifetime: 12
+      DeltaStep: 0.1
+      DeltaMin: 0.5
+      DeltaMax: 2
+      ComfortMargin: 0.5
+    BaseStats:
+      PlayerMaxHealth: 100
+      GroundDamage: 20
+      ArrowDamage: 10
+      ThornDamage: 10
+      StakesDamage: 10
+      FirstSpawnDelay: 5
   Seed: -1
+  ParticipantId: dev
+  ResetProgressOnStart: 0
+  TelemetryNearRadius: 4
+  LowHealthThreshold: 0.3
+  StillSpeed: 0.5
+  LogTelemetry: 1
+  WriteValidationLog: 1
+  LogEvolution: 1
   LogRoomLayout: 1

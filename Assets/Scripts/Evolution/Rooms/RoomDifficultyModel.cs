@@ -59,12 +59,14 @@ namespace Evolution.Rooms
 
             var groundAlive = AliveEnemies(groundSpawners, settings.Ground, profile.Lifetime(EnemyKind.Ground));
             var rangedAlive = AliveEnemies(rangedSpawners, settings.Ranged, profile.Lifetime(EnemyKind.Ranged));
-            var effectiveEnemiesRate = CrowdFactor(groundAlive + rangedAlive);
+            
+            //Crowd limits the melee enemies: they compete for the few places around the player.
+            var effectiveGroundEnemies = groundAlive * CrowdFactor(groundAlive);
 
             exposure[(int)DamageSource.GroundEnemy] =
-                groundAlive * effectiveEnemiesRate * Dps(settings.Ground, _stats.GroundDamage) * enemyTime / maxHealth;
+                effectiveGroundEnemies * Dps(settings.Ground, _stats.GroundDamage) * enemyTime / maxHealth;
             exposure[(int)DamageSource.Arrow] =
-                rangedAlive * effectiveEnemiesRate * Dps(settings.Ranged, _stats.ArrowDamage) * enemyTime / maxHealth;
+                rangedAlive * Dps(settings.Ranged, _stats.ArrowDamage) * enemyTime / maxHealth;
 
             // Traps: one "chance" per trap per minute, traps near the safe path count fully.
             var minutes = Math.Max(0f, duration) / 60f;
@@ -88,7 +90,7 @@ namespace Evolution.Rooms
         private static float Dps(SpawnerSettings spawner, float baseDamage) =>
             spawner.AttackCooldown > 0f ? baseDamage * spawner.DamageMultiplier / spawner.AttackCooldown : 0f;
 
-        // Fraction of the alive enemies that effectively attack (occupancy problem): there are C attack
+        // Fraction of the alive ground enemies that effectively attack (occupancy problem): there are C attack
         // slots around the player and each enemy takes one at random. A slot stays empty with probability
         // (1 - 1/C)^n, so the expected number of occupied slots is C * (1 - (1 - 1/C)^n).
         // The fraction is capped at 1 because n is an average and can be below 1.

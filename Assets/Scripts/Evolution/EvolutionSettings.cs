@@ -66,18 +66,24 @@ namespace Evolution
         // Traps farther than 1 cell from the safe path count this much compared to the ones near it.
         public float TrapFarWeight = 0.3f;
 
-        // How many enemies can really attack the player at the same time. With many enemies alive,
+        // How many GROUND enemies can really attack the player at the same time. With many of them alive,
         // the effective number of attackers saturates at this value (they block each other, the player
-        // only fights a few at once). Effective = C * (1 - (1 - 1/C)^alive), from the occupancy problem.
-        // Values below 1 are treated as 1.
+        // only fights a few at once). Effective = C * (1 - (1 - 1/C)^groundAlive), from the occupancy problem.
+        // Archers are not limited by it (they shoot from a distance). Values below 1 are treated as 1.
         public float CrowdCapacity = 3f;
     }
 
     [Serializable]
     public class ProfileSettings
     {
-        // Weight of the newest room in the moving averages (0.3 = recent rooms matter more).
-        public float Alpha = 0.3f;
+        // Weight of the newest run in the moving averages (0.4 = the last run counts 40%, the history 60%).
+        // The profile is calibrated once per run, pooling the rooms played (sum of damage / sum of exposure).
+        public float RunAlpha = 0.4f;
+        
+        // The first run uses FirstRunAlpha, and the alpha falls linearly to RunAlpha over AlphaWarmupRuns runs
+        // (0.7 -> 0.55 -> 0.4 with the defaults). Never goes below RunAlpha. AlphaWarmupRuns = 0 turns it off.
+        public float FirstRunAlpha = 0.7f;
+        public int AlphaWarmupRuns = 2;
 
         // A source is only recalibrated when its exposure in the played room was at least this much,
         // so a room with a single far trap does not throw the trap weight around.
@@ -85,9 +91,9 @@ namespace Evolution
         public float MaxWeight = 1.5f;
 
         // Initial "fraction of the potential damage that lands", per source.
-        public float DefaultEnemyWeight = 0.02f;
+        public float DefaultEnemyWeight = 0.004f;
         public float DefaultArrowWeight = 0.02f;
-        public float DefaultTrapWeight = 0.3f;
+        public float DefaultTrapWeight = 0.1f;
 
         // Initial lifetime (seconds) of an enemy with health multiplier 1.
         public float DefaultGroundLifetime = 10f;
