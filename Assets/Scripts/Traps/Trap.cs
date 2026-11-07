@@ -1,5 +1,7 @@
 using Telemetry;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 using PlayerClass = Player.Player;
 
 namespace Traps
@@ -16,7 +18,45 @@ namespace Traps
         private int _entitiesOnTrap = 0;
         
         private int _playerContacts = 0;
+        
+        public const string DefaultAreaName = "Trap";
     
+        [Header("Navigation")]
+        [Tooltip("NavMesh area of the trap (create it in Window > AI > Navigation > Areas, cost 1). Empty = no area.")]
+        public string NavMeshAreaName = DefaultAreaName;
+        
+        private static bool _warnedMissingArea;
+        
+        private void Awake()
+        {
+            MarkNavMeshArea();
+        }
+        
+        private void MarkNavMeshArea()
+        {
+            if (string.IsNullOrEmpty(NavMeshAreaName)) return;
+
+            var area = NavMesh.GetAreaFromName(NavMeshAreaName);
+            if (area < 0)
+            {
+                if (_warnedMissingArea) return;
+                Debug.LogWarning($"[Trap] NavMesh area '{NavMeshAreaName}' does not exist, enemies will never learn to avoid traps. " +
+                                 "Create it in Window > AI > Navigation > Areas.");
+                _warnedMissingArea = true;
+                return;
+            }
+            
+            var volume = gameObject.AddComponent<NavMeshModifierVolume>();
+            volume.area = area;
+            foreach (var box in GetComponents<BoxCollider>())
+            {
+                if (box.isTrigger) continue;
+                volume.center = box.center;
+                volume.size = new Vector3(box.size.x, box.size.y + 4f, box.size.z);
+                break;
+            }
+        }
+        
         private void Start()
         {
             _animator = GetComponent<Animator>();

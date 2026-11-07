@@ -1,6 +1,8 @@
 using System;
 using Evolution.Telemetry;
+using Traps;
 using UnityEngine;
+using UnityEngine.AI;
 using PlayerClass = Player.Player;
 
 namespace Enemies
@@ -34,6 +36,9 @@ namespace Enemies
         public float ProximityRadius = 3f; 
         public LayerMask ObstacleLayer;
 
+        [Header("Traps")]
+        public float LearnedTrapCost = 5f;
+        
         [Header("Advanced AI Feel")]
         public Vector3 EyeOffset = new Vector3(0, 1f, 0);
         public float InvestigationOvershoot = 1.5f;
@@ -53,6 +58,8 @@ namespace Enemies
         private Vector3 _lastKnownPosition;
         private Vector3 _previousPlayerPosition;
         private float _distanceToPlayer;
+        private int _trapArea = -1;
+        private bool _avoidsTraps;
         
         private new void Start()
         {
@@ -67,6 +74,16 @@ namespace Enemies
             DamageHitbox.Source = AttackSource;
 
             _attackTimer = AttackCooldown;
+            
+            _trapArea = NavMesh.GetAreaFromName(Trap.DefaultAreaName);
+            if (_trapArea >= 0) navMeshAgent.SetAreaCost(_trapArea, 1f);
+        }
+        
+        public void LearnToAvoidTraps()
+        {
+            if (_avoidsTraps || _trapArea < 0 || navMeshAgent == null || !navMeshAgent.enabled) return;
+            navMeshAgent.SetAreaCost(_trapArea, LearnedTrapCost);
+            _avoidsTraps = true;
         }
 
         protected override void Update()
@@ -219,6 +236,7 @@ namespace Enemies
             
             CurrentState = EnemyState.Hit;
             animator.SetTrigger(WasHit);
+            animator.SetBool(IsChasing, false);
             
             navMeshAgent.velocity = Vector3.zero;
             navMeshAgent.isStopped = true;

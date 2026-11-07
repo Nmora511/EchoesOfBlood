@@ -1,3 +1,4 @@
+using Enemies;
 using Evolution.Telemetry;
 using UnityEngine;
 using PlayerClass = Player.Player;
@@ -21,7 +22,10 @@ namespace Traps
             }
             else
             {
-                entityCollided.OnHit(Damage, transform.position);
+                if (entityCollided.OnHit(Damage, transform.position) && entityCollided is FsmEnemy enemy)
+                {
+                    enemy.LearnToAvoidTraps();
+                }
             }
         }
     }

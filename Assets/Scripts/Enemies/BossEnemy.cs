@@ -42,6 +42,10 @@ namespace Enemies
 
         [Header("Wait")]
         public float WaitTime = 2f;
+        
+        [Header("Start")]
+        [Tooltip("Seconds the boss stands still, turning to the player, before the behaviour tree starts.")]
+        public float StartDelay = 2f;
 
         private Node _tree;
         private float _baseSpeed;
@@ -50,6 +54,7 @@ namespace Enemies
         private float _lastMeleeTime;
         private float _lastAreaTime;
         private float _lastRushTime;
+        private float _treeStartTime;
 
         private new void Start()
         {
@@ -67,12 +72,21 @@ namespace Enemies
             _lastRushTime = -RushCooldown;
 
             BuildTree();
+            _treeStartTime = Time.time + StartDelay;
+            ConfigureAgent(_baseSpeed, _baseAcceleration, true);
         }
 
         public new void Update()
         {
             base.Update();
             if (_tree == null || Target is null || HealthPoints <= 0f) return;
+            
+            if (Time.time < _treeStartTime)
+            {
+                navMeshAgent.isStopped = true;
+                RotateTowards(Target.position);
+                return;
+            }
             _tree.Evaluate();
         }
 

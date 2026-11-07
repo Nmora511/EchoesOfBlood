@@ -47,8 +47,14 @@ public abstract class Entity : MonoBehaviour
         }
         
         // Knockback handler
-        var pushDirection = (transform.position - attackerPosition).normalized;
+        var pushDirection = transform.position - attackerPosition;
         pushDirection.y = 0f;
+        if (pushDirection.sqrMagnitude < 0.0001f)
+        {
+            pushDirection = -transform.forward;
+            pushDirection.y = 0f;
+        }
+        pushDirection.Normalize();
         
         KnockbackVelocity = pushDirection * KnockbackForce;
         
