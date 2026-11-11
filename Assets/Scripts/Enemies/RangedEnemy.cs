@@ -5,7 +5,8 @@ namespace Enemies
 {
     public class RangedEnemy : FsmEnemy
     {
-        private static readonly int HasAttacked = Animator.StringToHash("hasAttacked");
+        private static readonly int IsAiming = Animator.StringToHash("isAiming");
+        private static readonly int HasShot = Animator.StringToHash("hasShot");
 
         public Rigidbody ArrowObject;
         
@@ -26,11 +27,12 @@ namespace Enemies
         // Starts the charge animation. The arrow is only shot when the cooldown ends (AttackFinished)
         private void Charge()
         {
-            animator.SetTrigger(HasAttacked);
+            animator.SetTrigger(IsAiming);
         }
         
         private void Shoot()
         {
+            animator.SetTrigger(HasShot);
             var shootRay =  new Ray(transform.position, transform.forward);
 
             var targetPoint = Physics.Raycast(shootRay, out var hit, 75,_playerLayerMask) ? hit.point : shootRay.GetPoint(75);

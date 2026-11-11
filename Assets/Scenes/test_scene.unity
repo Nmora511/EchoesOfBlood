@@ -686,6 +686,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Traps.DamageHitbox
   Damage: 0
+  Source: 0
 --- !u!1001 &539933867
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -826,6 +827,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Trap
   Damage: 10
   DamageHitbox: {fileID: 469164953}
+  NavMeshAreaName: Trap
 --- !u!54 &539933874
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1368,6 +1370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Traps.DamageHitbox
   Damage: 0
+  Source: 0
 --- !u!65 &1145387860
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1403,6 +1406,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Trap
   Damage: 10
   DamageHitbox: {fileID: 1145387859}
+  NavMeshAreaName: Trap
 --- !u!65 &1145387863
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -73,7 +73,7 @@ namespace Enemies
             DamageHitbox.Damage = AttackDamage;
             DamageHitbox.Source = AttackSource;
 
-            _attackTimer = AttackCooldown;
+            _attackTimer = 1f;
             
             _trapArea = NavMesh.GetAreaFromName(Trap.DefaultAreaName);
             if (_trapArea >= 0) navMeshAgent.SetAreaCost(_trapArea, 1f);
